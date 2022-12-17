@@ -1,0 +1,42 @@
+{
+    "configurations": [
+        {
+            "name": "Wii",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/opt/devkitpro/portlibs/ppc/include/**",
+                "/opt/devkitpro/libogc/include",
+                "/opt/devkitpro/portlibs/ppc/include/",
+                "/opt/devkitpro/devkitPPC/bin/../lib/gcc/powerpc-eabi/12.1.0/../../../../powerpc-eabi/include/c++/12.1.0",
+                "/opt/devkitpro/devkitPPC/bin/../lib/gcc/powerpc-eabi/12.1.0/../../../../powerpc-eabi/include/c++/12.1.0/powerpc-eabi",
+                "/opt/devkitpro/devkitPPC/bin/../lib/gcc/powerpc-eabi/12.1.0/../../../../powerpc-eabi/include/c++/12.1.0/backward",
+                "/opt/devkitpro/devkitPPC/bin/../lib/gcc/powerpc-eabi/12.1.0/include",
+                "/opt/devkitpro/devkitPPC/bin/../lib/gcc/powerpc-eabi/12.1.0/include-fixed",
+                "/opt/devkitpro/devkitPPC/bin/../lib/gcc/powerpc-eabi/12.1.0/../../../../powerpc-eabi/include",
+                "/opt/devkitpro/libogc/include/ogc"
+            ],
+            "defines": [
+                "GEKKO",
+                "PPC"
+            ],
+            "compilerPath": "/opt/devkitpro/devkitPPC/bin/powerpc-eabi-g++",
+            "cStandard": "c17",
+            "cppStandard": "gnu++20",
+            "intelliSenseMode": "linux-gcc-x86",
+            "compilerArgs": ["-nostdinc"],
+            "configurationProvider": "ms-vscode.makefile-tools"
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c17",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-clang-x64"
+        }
+    ],
+    "version": 4
+}

@@ -1,0 +1,97 @@
+#ifndef CRCAL_MUTEX
+#define CRCAL_MUTEX
+
+#ifdef GEKKO
+#include <mutex.h>
+#include <system_error>
+
+namespace crcal
+{
+
+class mutex
+{
+    mutex_t handle;
+
+public:
+    mutex()
+    {
+        int err = -999;
+        if ((err = LWP_MutexInit(&handle, false)) < 0) 
+        { 
+            printf("Mutex init error\n");
+            throw std::error_code(err, std::system_category());
+        }
+    }
+    mutex(const mutex&) = delete;
+
+    void lock()
+    {
+        int err = -999;
+        if ((err = LWP_MutexLock(handle)) < 0) 
+        { 
+            printf("Mutex init error\n");
+            throw std::error_code(err, std::system_category());
+        }
+    }
+
+    bool try_lock()
+    {
+        int err = -999;
+        if ((err = LWP_MutexTryLock(handle)) < 0 || err == 1) 
+        {
+            return false;
+        }
+        return true;
+    }
+
+    void unlock()
+    {
+        int err = -999;
+        if ((err = LWP_MutexLock(handle)) < 0) 
+        { 
+            printf("Mutex unlock error\n");
+            throw std::error_code(err, std::system_category());
+        }
+    }
+};
+
+template <typename MutexT>
+class lock_guard
+{
+    MutexT& mutex;
+
+public:
+    lock_guard(MutexT& _mutex) : mutex(_mutex) 
+    {
+        mutex.lock();
+    }
+
+    ~lock_guard()
+    {
+        mutex.unlock();
+    }
+};
+
+}
+
+using Mutex = crcal::mutex;
+
+template <typename MutexT>
+using LockGuard = crcal::lock_guard<MutexT>;
+
+using LockGuardMutex = crcal::lock_guard<Mutex>;
+
+#else
+
+#include <mutex>
+
+using Mutex = std::mutex;
+
+template <typename MutexT>
+using LockGuard = std::lock_guard<MutexT>;
+
+using LockGuardMutex = std::lock_guard<Mutex>;
+
+#endif
+
+#endif // ifndef CRCAL_MUTEX

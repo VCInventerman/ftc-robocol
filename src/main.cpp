@@ -19,8 +19,10 @@
 
 #include <debug/vector>
 
-#include "packet.h"
-#include "handler.h"
+#include "robocol/DriverStation.h"
+#include "robocol/handlers.h"
+
+using namespace librobocol;
 
 struct local_inet_ntop
 {
@@ -116,23 +118,10 @@ int main(int argc, char *argv[])
 
 		initNetwork();
 
-		printf("Past init5\n");
-
 		DriverStation station("192.168.43.164");
-		printf("Past init1\n");
 
-		PacketProcessor processor;
-		printf("Past init2\n");
-		processor.initWithDefaults();
-
-		printf("Past init\n");
-
-		//LWP_CreateThread(&netFlowHandle, /* thread handle */
-		//				 netFlow,		 /* code */
-		//				 &processor,	 /* arg pointer for thread */
-		//				 NULL,			 /* stack base */
-		//				 16 * 1024,		 /* stack size */
-		//				 50 /* thread priority */);
+		PacketProcessor processor = getRobocolPacketProcessor();
+		
 
 		int64_t time = currentTimeNs();
 		int64_t deltaTime = 0;

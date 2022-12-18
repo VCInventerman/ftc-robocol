@@ -1,11 +1,32 @@
-#ifndef CRCAL_MUTEX
-#define CRCAL_MUTEX
+#if !defined(LIBROBOCOL_SYNC_H)
+#define LIBROBOCOL_SYNC_H
 
-#ifdef GEKKO
+// Usage:
+// In the scope you want to be syncronized, put:
+// auto l = lock();
+#define SYNCHRONIZED_CLASS                           \
+    Mutex accessM;                              \
+    LockGuardMutex lock()               \
+    {                                                \
+        return {accessM}; \
+    }
+
+#define STATIC_SYNCHRONIZED_CLASS                    \
+    static Mutex accessM;      \
+    static LockGuardMutex lock()        \
+    {                                                \
+        return {accessM}; \
+    }
+
+
+// Implementation of a mutex that chooses between std::mutex (if present) and the wii/gamecube specific libogc mutex implementation
+
+#ifdef GEKKO // Macro present when code is compiled for the GC and Wii
+
 #include <mutex.h>
 #include <system_error>
 
-namespace crcal
+namespace librobocol
 {
 
 class mutex
@@ -17,8 +38,7 @@ public:
     {
         int err = -999;
         if ((err = LWP_MutexInit(&handle, false)) < 0) 
-        { 
-            printf("Mutex init error\n");
+        {
             throw std::error_code(err, std::system_category());
         }
     }
@@ -28,8 +48,7 @@ public:
     {
         int err = -999;
         if ((err = LWP_MutexLock(handle)) < 0) 
-        { 
-            printf("Mutex init error\n");
+        {
             throw std::error_code(err, std::system_category());
         }
     }
@@ -48,8 +67,7 @@ public:
     {
         int err = -999;
         if ((err = LWP_MutexLock(handle)) < 0) 
-        { 
-            printf("Mutex unlock error\n");
+        {
             throw std::error_code(err, std::system_category());
         }
     }
@@ -74,14 +92,16 @@ public:
 
 }
 
-using Mutex = crcal::mutex;
+using Mutex = librobocol::mutex;
 
 template <typename MutexT>
-using LockGuard = crcal::lock_guard<MutexT>;
+using LockGuard = librobocol::lock_guard<MutexT>;
 
-using LockGuardMutex = crcal::lock_guard<Mutex>;
+using LockGuardMutex = librobocol::lock_guard<Mutex>;
 
 #else
+
+// Just use the standard libraries' version when present
 
 #include <mutex>
 
@@ -94,4 +114,4 @@ using LockGuardMutex = std::lock_guard<Mutex>;
 
 #endif
 
-#endif // ifndef CRCAL_MUTEX
+#endif // if !defined(LIBROBOCOL_SYNC_H)

@@ -36,3 +36,9 @@
 
 # Fonts we can't share
 data/
+
+.vscode/
+
+# Build artifacts
+*.elf
+all/

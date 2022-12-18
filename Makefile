@@ -36,7 +36,8 @@ CFLAGS	= -g -O2 -Wall $(MACHDEP) $(INCLUDE)
 CXXFLAGS	=	$(CFLAGS)
 
 ifeq ($(GAMESYSTEM),wii)
-CXXFLAGS	=	$(CFLAGS) -D__WIISYSTEM__ -std=gnu++20  -frtti -fsanitize=leak -Wall
+CXXFLAGS	=	$(CFLAGS) -D__WIISYSTEM__ -std=gnu++20  -frtti -fsanitize=leak -Wall \
+				-Wno-narrowing # Required for FreeTypeGX.cpp
 else
 CXXFLAGS	=	$(CFLAGS)
 endif

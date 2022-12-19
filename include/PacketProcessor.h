@@ -18,7 +18,7 @@ template <typename EnvT>
 class PacketHandler
 {
 public:
-    virtual size_t process(EnvT &conn, const char *begin, const char *end) = 0;
+    virtual size_t process(EnvT* conn, const char *begin, const char *end) = 0;
 
     virtual ~PacketHandler() = default;
 };
@@ -47,11 +47,11 @@ public:
     }
 
     // Process a buffer of packets, which may contain more than one.
-    void process(EnvT &env, const char *begin, const char *end)
+    void process(EnvT* env, const char *begin, const char *end)
     {
         assert(end > begin);
 
-        typename EnvT::MsgType type = env.peekType(begin, end);
+        typename EnvT::MsgType type = (typename EnvT::MsgType)env->peekType(begin, end);
 
         // printf("Message of type %d\n", type);
 
@@ -63,6 +63,11 @@ public:
         {
             printf("Skipping processing type %d\n", (int)type);
         }
+    }
+
+    size_t packetTypeCount()
+    {
+        return handlers.size();
     }
 };
 

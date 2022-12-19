@@ -534,14 +534,14 @@ namespace librobocol
 
 
 
-        float left_stick_x = 0.0;
-        float left_stick_y = 0.0;
-        float right_stick_x = 0.0;
-        float right_stick_y = 0.0;
-        float left_trigger = 0.0;
-        float right_trigger = 0.0;
-        float touchpad_finger_1_x = 0.0;
-        float touchpad_finger_1_y = 0.0;
+        float left_stick_x = 0.0f;
+        float left_stick_y = 0.0f;
+        float right_stick_x = 0.0f;
+        float right_stick_y = 0.0f;
+        float left_trigger = 0.0f;
+        float right_trigger = 0.0f;
+        float touchpad_finger_1_x = 0.0f;
+        float touchpad_finger_1_y = 0.0f;
         int32_t buttons = 0;
 
         int32_t id = -1;
@@ -558,6 +558,7 @@ namespace librobocol
 
             size_t payloadLength = BUFFER_SIZE - 5;
             written += (PacketHeader{MsgType::GAMEPAD, (uint16_t)payloadLength, sequenceNum}).emit(out);
+            printf("starting %d ", written);
 
             written += emit(ROBOCOL_GAMEPAD_VERSION, out);
             written += emit(id, out);
@@ -569,15 +570,22 @@ namespace librobocol
             written += emit(left_trigger, out); // left_trigger
             written += emit(right_trigger, out); // right_trigger
             written += emit(buttons, out);   // buttons
+            printf("%d ", written);
+
 
             written += emit(user, out);
             written += emit((uint8_t)LegacyType::LOGITECH_F310, out);
             written += emit((uint8_t)LegacyType::LOGITECH_F310, out);
+            printf("%d", written);
+
 
             written += emit(touchpad_finger_1_x, out); // touchpad_finger_1_x
             written += emit(touchpad_finger_1_y, out); // touchpad_finger_1_y
-            written += emit(0.0, out); // touchpad_finger_2_x
-            written += emit(0.0, out); // touchpad_finger_2_y
+            written += emit(0.0f, out); // touchpad_finger_2_x
+            written += emit(0.0f, out); // touchpad_finger_2_y
+
+            printf("%d\n", written);
+
 
             return written;
         }
@@ -618,8 +626,8 @@ namespace librobocol
             }
             else
             {
-                packet.touchpad_finger_1_x = 0.0;
-                packet.touchpad_finger_1_y = 0.0;
+                packet.touchpad_finger_1_x = 0.0f;
+                packet.touchpad_finger_1_y = 0.0f;
             }
 
             if (controller->exp.type == WPAD_EXP_NUNCHUK)

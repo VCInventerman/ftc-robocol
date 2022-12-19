@@ -37,7 +37,7 @@ public:
     mutex()
     {
         int err = -999;
-        if ((err = LWP_MutexInit(&handle, false)) < 0) 
+        if ((err = LWP_MutexInit(&handle, true /*Recursive*/)) < 0) 
         {
             throw std::error_code(err, std::system_category());
         }

@@ -52,8 +52,8 @@ std::pair<GXRModeObj *, void *> initVideo()
 
 	renderMode = VIDEO_GetPreferredMode(NULL);
 	framebuffer = MEM_K0_TO_K1(SYS_AllocateFramebuffer(renderMode));
-	//console_init(framebuffer, 20, 20, renderMode->fbWidth, renderMode->xfbHeight, renderMode->fbWidth * VI_DISPLAY_PIX_SZ);
-	CON_InitEx(renderMode, 20, 20, renderMode->fbWidth, 100);
+	console_init(framebuffer, 20, 20, renderMode->fbWidth, renderMode->xfbHeight, renderMode->fbWidth * VI_DISPLAY_PIX_SZ);
+	//CON_InitEx(renderMode, 20, 20, renderMode->fbWidth, 100);
 
 	WPAD_Init();
 	WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC_IR);
@@ -118,9 +118,9 @@ int main(int argc, char *argv[])
 
 		initNetwork();
 
-		DriverStation station("192.168.43.164");
+		DriverStation station("192.168.43.1"); // Rev Control Hub
+		//DriverStation station("192.168.43.164"); // motorola phone hotspot
 
-		PacketProcessor processor = getRobocolPacketProcessor();
 		
 
 		int64_t time = currentTimeNs();

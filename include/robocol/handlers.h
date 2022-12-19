@@ -20,26 +20,30 @@ namespace librobocol
             connection.sendPacket(ack);
         }
 
-        size_t process(RobocolConnection &connection, const char *begin, const char *end)
+        size_t process(RobocolConnection* connection, const char *begin, const char *end)
         {
             Command packet;
             packet.parse(begin, end);
 
             printf("Got command for data %s and %s", packet.name.c_str(), packet.extra.data());
 
-            connection.handle(packet);
+            connection->handle(packet);
 
             return (end - begin);
         }
     };
 
-    PacketProcessor<RobocolConnection> getRobocolPacketProcessor()
+    PacketProcessor<RobocolConnection>* getRobocolPacketProcessor()
     {
-        PacketProcessor<RobocolConnection> processor;
+        static PacketProcessor<RobocolConnection> processor;
 
-        processor.addHandler(std::make_unique<CommandHandler>(), MsgType::COMMAND);
+        if (processor.packetTypeCount() == 0)
+        {
+            //todo: telemetry
+            processor.addHandler(std::make_unique<CommandHandler>(), MsgType::COMMAND);
+        }
 
-        return processor;
+        return &processor;
     }
 }
 

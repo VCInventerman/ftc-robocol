@@ -57,8 +57,11 @@ namespace librobocol
                 size_t dist = std::distance(freeBufs.begin(), itr);
                 printf("Moving from len %u with a dist of %u\n", freeBufs.size(), dist);
                 FixedBuf buf = std::move(freeBufs[dist]);
-                // freeBufs.erase(itr);
+                freeBufs.erase(itr);
                 buf.len = size;
+
+                removeFreeBufs();
+
                 return buf;
             }
         }
@@ -67,15 +70,14 @@ namespace librobocol
         {
             auto l = lock();
 
-            printf("stage 6\n");
-
-            freeBufs.emplace_back(FixedBuf());
-
-            printf("stage 7\n");
+            //freeBufs.emplace_back(FixedBuf());
 
             freeBufs.emplace_back(std::move(buf));
+        }
 
-            printf("stage 8\n");
+        static void removeFreeBufs()
+        {
+            std::remove_if(freeBufs.begin(), freeBufs.end(), [](const FixedBuf& buf) { return buf.len == 0; });
         }
     };
     Mutex BufCache::accessM = {};

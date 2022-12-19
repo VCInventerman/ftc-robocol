@@ -8,6 +8,7 @@
 #include "FixedBuf.h"
 #include "BufCache.h"
 #include "Socket.h"
+#include "PacketProcessor.h"
 
 
 namespace librobocol
@@ -23,13 +24,25 @@ namespace librobocol
         std::deque<FixedBuf> writeQueue;
         Mutex writeQueueMutex;
 
+        std::unique_ptr<char[]> readBuf;
+        size_t readBufSize = 66000;
+
+        std::function<void(char*, char*)> processor;
+
         // Unconnected socket
-        UdpSocket() {}
+        UdpSocket()
+        {
+            readBuf = std::make_unique<char[]>(66000);
+        }
 
         // Create a UDP client socket listening on all interfaces
-        UdpSocket(int port, const char *targetIp)
+        UdpSocket(int port, const char *targetIp, std::function<void(char*, char*)> processorFunc)
         {
             int ret = -999;
+
+            processor = processorFunc;
+
+            readBuf = std::make_unique<char[]>(66000);
 
             printf("Opening a socket on %s:%d", targetIp, port);
 
@@ -78,6 +91,16 @@ namespace librobocol
 
             if (events & POLLIN)
             {
+                u32 readBytes = getTargetAddrSize();
+                ret = net_recvfrom(native, readBuf.get(), readBufSize, 0, getTargetAddr(), &readBytes);
+                if (ret < 0)
+                {
+                    printf("recvfrom error %d\n", ret);
+                }
+                else
+                {
+                    processor(readBuf.get(), readBuf.get() + readBytes);
+                }
             }
 
             if (events & POLLOUT)
@@ -94,7 +117,6 @@ namespace librobocol
                     }
 
                     BufCache::recycle(std::move(buf));
-                    printf("stage 5\n");
                 }
             }
 
@@ -122,11 +144,8 @@ namespace librobocol
 
             if (writeQueue.size() > 0)
             {
-                printf("stage 1\n");
                 FixedBuf ret = std::move(writeQueue.front());
-                printf("stage 2\n");
                 writeQueue.pop_front();
-                printf("stage 3\n");
                 return ret;
             }
             else

@@ -9,6 +9,9 @@
 
 namespace librobocol
 {
+    class RobocolConnection;
+    PacketProcessor<RobocolConnection>* getRobocolPacketProcessor();
+
     class RobocolConnection
     {
     public:
@@ -28,7 +31,8 @@ namespace librobocol
             RobocolConnection(ROBOCOL_ROBOT_IP_DEFAULT, ROBOCOL_PORT_DEFAULT)
             {}
 
-        RobocolConnection(const char *robotIpStr, uint16_t port = 20884) : sock(port, robotIpStr)
+        RobocolConnection(const char *robotIpStr, uint16_t port = 20884) : 
+            sock(port, robotIpStr, std::bind(&PacketProcessor<RobocolConnection>::process, getRobocolPacketProcessor(), this, std::placeholders::_1, std::placeholders::_2))
         {
             SocketPool::add(sock);
             init();
@@ -56,11 +60,11 @@ namespace librobocol
         template <typename T>
         void sendPacket(T &packet)
         {
-            printf("Going to write gamepad packet\n");
+            printf("Going to write packet of type %s\n", typeid(packet).name());
             FixedBuf writeBuf = BufCache::getBuf(packet.getSize());
-            packet.serialize(writeBuf.begin());
+            size_t written = packet.serialize(writeBuf.begin());
             sock.write(std::move(writeBuf));
-            printf("Going to write gamepad packet2\n");
+            printf("Wrote packet, size %d\n", written);
         }
 
         void tick(int64_t delta)

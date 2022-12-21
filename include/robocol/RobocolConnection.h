@@ -76,13 +76,13 @@ namespace librobocol
         template <typename PacketT>
         void handle(PacketT &packet)
         {
-            assert(false);
+            printf("USING WRONG PROTOTYPE FOR PACKETT %s\n", typeid(packet).name());
         }
 
         template <typename PacketT>
         void handle(Command &packet)
         {
-            printf("Looking at a command");
+            printf("Looking at a command\n");
         }
 
         ~RobocolConnection()

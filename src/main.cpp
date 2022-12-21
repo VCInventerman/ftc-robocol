@@ -118,8 +118,8 @@ int main(int argc, char *argv[])
 
 		initNetwork();
 
-		DriverStation station("192.168.43.1"); // Rev Control Hub
-		//DriverStation station("192.168.43.164"); // motorola phone hotspot
+		//DriverStation station("192.168.43.1"); // Rev Control Hub
+		DriverStation station("192.168.43.164"); // motorola phone hotspot
 
 		
 

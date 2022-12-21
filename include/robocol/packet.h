@@ -483,15 +483,18 @@ namespace librobocol
         template <typename ItrT>
         ItrT parse(ItrT begin, ItrT end)
         {
-            size_t bytesLeft = end - begin;
+            auto bytesLeft = [&](){ return end - begin; };
 
             MsgType type = MsgType::EMPTY;
             uint16_t payloadLength = 0;
 
-            assert(end - begin > 5);
+            //assert(end - begin > 5);
+            if (end - begin <= 5) { printf("Parse fail 1\n"); return begin; }
 
             read(begin, end, type);
-            assert(type == MsgType::COMMAND);
+            //assert(type == MsgType::COMMAND);
+            if (type != MsgType::COMMAND) { printf("Parse fail 2\n"); return begin; }
+
 
             read(begin, end, payloadLength);
             read(begin, end, sequenceNum);
@@ -501,10 +504,12 @@ namespace librobocol
 
             uint16_t nameLength = 0;
             read(begin, end, nameLength);
-            assert(nameLength < 1000 && nameLength < bytesLeft);
+            //assert(nameLength < 1000 && nameLength < bytesLeft);
+            if (nameLength > 1000) { printf("Parse fail 3\n"); return begin; }
+            if (nameLength > bytesLeft()) { printf("Parse fail 4 (packet too small)\n"); return begin; }
 
             name.resize(nameLength, '\0');
-            std::copy(begin, end, name.data());
+            std::copy(begin, begin + nameLength, name.data());
             begin += nameLength;
 
             if (!acknowledged)
@@ -512,10 +517,14 @@ namespace librobocol
                 uint16_t extraLength = 0;
                 read(begin, end, extraLength);
 
+                if (extraLength > bytesLeft()) { printf("Parse fail 5 (packet too small)\n"); return begin; }
+
                 extra.resize(extraLength, '\0');
-                std::copy(begin, end, extra.data());
+                std::copy(begin, begin + extraLength /*end*/, extra.data());
                 begin += extraLength;
             }
+
+            printf("finished parsing\n");
 
             return begin;
         }

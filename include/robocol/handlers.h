@@ -25,9 +25,18 @@ namespace librobocol
             Command packet;
             packet.parse(begin, end);
 
-            printf("Got command for data %s and %s", packet.name.c_str(), packet.extra.data());
+            //printf("Got command for data %s and %s", packet.name.c_str(), packet.extra.data());
 
-            connection->handle(packet);
+            //connection->handle<Command>(packet);
+
+            // Send the acknowledgement back if needed
+            if (packet.acknowledged == false)
+            {
+                packet.acknowledged = false;
+                //FixedBuf ack = BufCache::getBuf(packet.getSize());
+                //packet.serializeForTransmit(ack.begin());
+                //connection->sendPacket(packet);
+            }
 
             return (end - begin);
         }

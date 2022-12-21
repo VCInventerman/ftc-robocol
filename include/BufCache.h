@@ -55,7 +55,6 @@ namespace librobocol
             {
                 //todo: prevent bufs gradually losing size?
                 size_t dist = std::distance(freeBufs.begin(), itr);
-                printf("Moving from len %u with a dist of %u\n", freeBufs.size(), dist);
                 FixedBuf buf = std::move(freeBufs[dist]);
                 freeBufs.erase(itr);
                 buf.len = size;

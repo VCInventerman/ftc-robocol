@@ -54,9 +54,14 @@ namespace librobocol
             }
 
             // Match all IPs on port (0.0.0.0)
-            bindAddr = {.sin_len = sizeof(bindAddr), .sin_family = AF_INET, .sin_port = (u16)htons(port)};
+            //bindAddr = {.sin_len = sizeof(bindAddr), .sin_family = AF_INET, .sin_port = (u16)htons(port)};
             //bindAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-            bindAddr.sin_addr.s_addr = inet_addr(targetIp);
+            //bindAddr.sin_addr.s_addr = inet_addr(targetIp);
+
+            memset(&bindAddr, 0, sizeof(bindAddr));
+            bindAddr.sin_family    = AF_INET; // IPv4 
+            bindAddr.sin_addr.s_addr = INADDR_ANY; 
+            bindAddr.sin_port = htons(port); 
 
             // Create UDP socket
             native = net_socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
@@ -69,10 +74,10 @@ namespace librobocol
             printf("Target:%s", inet_ntoa(*(in_addr*)&bindAddr.sin_addr));
 
             // Bind socket for packets to be sent back to it
-            //ret = net_bind(native, (sockaddr *)&bindAddr, sizeof(bindAddr));
+            ret = net_bind(native, (sockaddr *)&bindAddr, sizeof(bindAddr));
             if (ret < 0)
             {
-                //perror("Failed to bind");
+                perror("Failed to bind");
             }
 
             // Set nonblocking
@@ -91,15 +96,23 @@ namespace librobocol
 
             if (events & POLLIN)
             {
+                printf("Ready to read!\n");
+
+
+
                 u32 readBytes = getTargetAddrSize();
-                ret = net_recvfrom(native, readBuf.get(), readBufSize, 0, getTargetAddr(), &readBytes);
+                //ret = net_recvfrom(native, readBuf.get(), readBufSize, 0, getTargetAddr(), &readBytes);
+                //ret = net_recvfrom(native, readBuf.get(), readBufSize, 0, nullptr, nullptr);
+                ret = net_read(native, readBuf.get(), 50000);
                 if (ret < 0)
                 {
-                    printf("recvfrom error %d\n", ret);
+                    //printf("recvfrom error %d\n", ret);
+                    perror("Recvfrom error"); 
                 }
                 else
                 {
-                    processor(readBuf.get(), readBuf.get() + readBytes);
+                    printf("Giving packet to processor of size %d ret %d\n", readBytes, ret);
+                    processor(readBuf.get(), readBuf.get() + ret);
                 }
             }
 

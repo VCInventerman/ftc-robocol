@@ -49,9 +49,13 @@ public:
     // Process a buffer of packets, which may contain more than one.
     void process(EnvT* env, const char *begin, const char *end)
     {
+        printf("processing\n");
         assert(end > begin);
 
         typename EnvT::MsgType type = (typename EnvT::MsgType)env->peekType(begin, end);
+
+        printf("processing type %d\n", (int)type);
+
 
         // printf("Message of type %d\n", type);
 
